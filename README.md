@@ -116,3 +116,31 @@ func ReturnIndex(users []User) int64 {
 }
 ```
 
+#### 进阶任务初步
+
+* Go语言http包工作原理
+
+1. 创建 Listen Socket, 监听指定的端口，等待客户端请求到来。
+
+2. Listen Socket 接受客户端的请求，得到 Client Socket, 接下来通过 Client Socket 与客户端通信。
+
+3. 处理客户端的请求，首先从 Client Socket 读取 HTTP 请求的协议头，如果是 POST 方法，还可能要读取客户端提交的数据，然后交给相应的 handler 处理请求，handler 处理完毕准备好客户端需要的数据，通过 Client Socket 写给客户端。
+
+* 理解处理GET请求的代码片段
+
+![http几种常用的请求](E:\技术学习\dian2021秋招\区块链组实习\http几种常用的请求.png)
+
+大致理解了组长给的代码的大致含义（看了一晚上文档，眼睛快没了~~~）
+
+知道了怎么设置handler，怎么设置env，怎么发起http请求等。
+
+### 10/3
+
+预期完成任务：
+
+1）通过阅读mux,godotenv,spew三个包的官方文档，了解三个包中一些函数的基本用法
+
+2）熟练掌握上面三个包的用法和功能
+
+3）运用三个包和net/http包中的函数完成验收任务
+

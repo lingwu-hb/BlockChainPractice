@@ -1,5 +1,7 @@
 # BlockChainPractice
+
 Dian_BlockChainPractice
+
 ## 日志
 
 ### 10/1
@@ -55,8 +57,7 @@ PoW，全称为Proof of Work（工作量证明）。由于哈希算法的单向�
 * 实现PoW算法
 
 创世区块中难度值为1（也就是前32位为零）
-
-![image-20211001144935563](C:\Users\lingwu\AppData\Roaming\Typora\typora-user-images\image-20211001144935563.png)
+![image-20211001144935563](https://user-images.githubusercontent.com/69802739/135760245-0ef706ac-d39e-4281-ba11-85d3634e5b0e.png)
 
 #### PoS算法
 
@@ -128,7 +129,7 @@ func ReturnIndex(users []User) int64 {
 
 * 理解处理GET请求的代码片段
 
-![http几种常用的请求](E:\技术学习\dian2021秋招\区块链组实习\http几种常用的请求.png)
+![http几种常用的请求](https://user-images.githubusercontent.com/69802739/135760272-36fbe753-6ba5-4c20-929f-aaa2089bcac0.png)
 
 大致理解了组长给的代码的大致含义（看了一晚上文档，眼睛快没了~~~）
 
@@ -136,7 +137,7 @@ func ReturnIndex(users []User) int64 {
 
 ### 10/3
 
-预期完成任务：
+预期完成：
 
 1）通过阅读mux,godotenv,spew三个包的官方文档，了解三个包中一些函数的基本用法
 
@@ -144,3 +145,40 @@ func ReturnIndex(users []User) int64 {
 
 3）运用三个包和net/http包中的函数完成验收任务
 
+#### 理解gorilla/mux包的作用
+
+该包主要是提供一个方便操作的路由复用器，这样就不用使用http包里面的ServerMux。（因为ServerMux无法提供一些复杂的路由功能）
+
+#### 理解godotnev和spew两个包的作用
+
+godotnev主要是读取.env文件，设置环境变量，然后获取端口号的作用。
+
+spew代替fmt进行更牛皮的格式化输出
+
+#### 成功完成GET请求，监听端口号为9000
+
+#### 尝试完成POST请求
+
+* 理解io包的用法，和基本函数。尝试再GET请求实现的基础上完成POST请求
+
+![image-20211003205125804](https://user-images.githubusercontent.com/69802739/135760349-a83b243e-9fbd-4735-8301-6877da7e3290.png)
+
+由于不知道为什么一直无法解析（因为请求的格式问题），所以用两个相似的进行比对，最终得出结论。（下图）
+
+![image-20211003210657033](https://user-images.githubusercontent.com/69802739/135760361-a50f2063-c285-4640-82a9-cf6eb4c528fa.png)
+
+可以看出图中的斜线，以及两边的飘点，还有10没有双引号，综上所述，便可得出正确的格式输入！
+
+![image-20211003210640751](https://user-images.githubusercontent.com/69802739/135760367-405d4968-62bd-4052-85f0-cff6d469af40.png)
+
+咦，为啥DATA可以读取，但是Bmp的值却一直为零了。从晚上七点到九点，这个问题让我想不明白。我以为是因为只能读取字符串，然后想把bmp弄成字符串，然后再转换成数字，可惜还是失败了。最后尝试了多种方法仍无果后，我无意间看到了BPM这个有点小奇怪。再仔细一看，我人傻了。输入的请求是BPM，结构体字段内的值为BMP，这当然无法读取了。难受，一个小拼写错误浪费了我两个多钟头！非常得离谱！
+
+最终完成了POST请求。（测试时难度值设为1，设定为10的话，PoW算法需要一点时间算出来）
+
+### 10/4
+
+预期完成任务：
+
+1）理解PBFT和Raft算法
+
+2）读懂案例代码并补全

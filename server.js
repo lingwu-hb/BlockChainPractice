@@ -9,7 +9,7 @@ const server = net.createServer((socket) => {
             socket.write(
                 Buffer.from(data[lessonid])
             );
-        }, 50)
+        }, 1000)
     });
 });
 

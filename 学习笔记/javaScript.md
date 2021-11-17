@@ -21,6 +21,8 @@ JavaScript 拥有动态类型。这意味着相同变量可用作不同类型。
 
 ### let和const
 
+var创建的变量没有块级作用域。
+
 let用于创建一个具有块作用域的变量。
 
 而const必须在创建时赋初值，而且不能改变该对象指向的内存地址。
@@ -72,11 +74,13 @@ js中，函数也不例外是一种对象。
 
 * 参数规则：
 
-JavaScript 函数定义不会为参数（parameter）规定数据类型。
+JavaScript 函数**定义**不会为参数（parameter）规定数据类型。
 
-JavaScript 函数不会对所传递的参数（argument）实行类型检查。
+JavaScript 函数**不会**对所传递的参数（argument）实行类型检查。
 
-JavaScript 函数不会检查所接收参数（argument）的数量。
+JavaScript 函数**不会**检查所接收参数（argument）的数量。
+
+对于函数，JavaScript什么都不会管。所以编写函数的时候需要尤其注意函数的正确性问题。
 
 语法：
 
@@ -165,6 +169,28 @@ let f = ([a, b] = [1, 2], {x: c} = {x: a + b}) => a + b + c;
 f();  // 6
 ```
 
+#### JavaScript闭包
+
+所谓闭包，其实就是指函数和函数内部可以访问到的元素的合称。闭包本身与包没有任何关系，英文翻译为closure。
+
+* 之所以需要用到闭包，其实就是需要隐藏变量。
+
+有些元素，不方便设置为全局变量，但是又需要让其他的函数进行修改，这个时候就需要使用闭包，给外部一个接口，让外部可以能够进行修改这个元素。
+
+```javascript
+function foo(){//函数foo就是接口，return bar()函数对象，供外部进行调用
+  heart = 1;
+  function bar(){//bar()和heart一起组成了一个闭包！
+    return (heart++);
+  }
+  return bar;
+}
+
+var x = foo();
+x();
+console.log(x());
+```
+
 #### js回调函数
 
 回调函数是作为参数传递给另一个函数的函数。
@@ -195,7 +221,7 @@ myCalculator(5, 5, myDisplayer);
 
 数组是特殊类型的对象，具有数字索引。
 
-数组和字符串一样，也有很多详细的方法，具体可以通过vscode插件进行详细查看。
+数组和字符串一样，也有很多详细的方法，具体可以通过vscode插件代码补全提示进行详细查看。
 
 具体常用方法列出几个如下：
 
@@ -251,7 +277,7 @@ var n = str.search(/w3school/i);
 
 call()和apply()方法是预定义的JavaScript方法。
 
-他们都可以用于将另一个对象作为参数调用对象方法。
+他们都可以用于**将另一个对象作为参数调用对象方法**。此时这个对象将会成为函数执行的this。
 
 ```javascript
 var person1 = {
@@ -266,9 +292,40 @@ var person2 = {
 console.log(person1.fullName.call(person2));  // 会返回 "Bill Gates"
 ```
 
+call()方法可以将实参在对象之后依次传递
+
+apply()方法需要将实参封装到一个数组中统一传递
+
+```javascript
+function fun(a, b){
+    console.log("a" + a);
+    console.log("b" + b);
+    console.log(this.name);
+}
+
+var obj1 = {
+    name: "obj1"
+}
+
+fun.call(obj1, 1, 2);
+```
+
+此时，this所指向的内容会改变。
+
+1. 以函数形式调用时，this永远都是window
+2. 以方法的形式调用时，this是调用方法的对象
+3. 以构造函数的形式调用时，this是新创建的那个对象
+4. 使用call()和apply()时，this是指定的那个对象
+
 ### 类
 
-与c++类似，类不是对象，类是对象的模板，用来创建对象。
+与c++中class的区别：
+
+JavaScript一切皆对象，继承通过对象的原型链实现，发生在new创建一个新对象的过程中。
+
+C++继承通过类实现，对象由类实例化得到。
+
+在JavaScript中，class只是一个语法糖，其设计的初衷就是方便那些习惯了以对象为基础的语言的程序员。JavaScript中的继承仍然是通过对象之间的原型链来实现的。
 
 ```javascript
 class Car{
@@ -287,6 +344,10 @@ let myCar1 = new Car("Ford", 2014);
 
 ```javascript
 class ClassName{
+    a: 2;
+    m: function(){
+        return this.a + 1;
+    }
 	constructor() {...}
 	method_1() {...}
 	method_2() {...}
@@ -435,6 +496,169 @@ p.then(function(data){
 //将回调地狱问题变为链式结构，得以优化
 ```
 
+通常情况下，需要一个程序去处理一些异步操作，这个程序可以类比为**生产者**。此时，代码的其他部分会继续运行，直到需要调用该部分时，才会等待其输出，调用者可以类比为**消费者**。promise就是为了解决调用部分的无限嵌套引起的代码难以维护问题。
+
+##### 关于promise，我的理解
+
+> JavaScript中用一个promise对象来表征一个异步程序的执行状态，其内部的state变量就是用来表示状态的变量的。根据异步程序的具体执行情况，promise对象通过执行resolve或者reject函数，告诉调用者，该异步程序已被执行完毕。然后promise通过其内置的result变量将结果进行返回。**所以可以说，异步程序与promise对象之间有着密不可分的关系，这也就是为什么一个async函数会返回一个promise对象的原因。**
+
+* 如何得到一个promise对象（生产者部分）
+
+executor （也就是处理一个异步任务的部分程序）会自动运行并尝试执行一项工作。尝试结束后，如果成功则调用 `resolve`，如果出现 error 则调用 `reject`。
+
+由 `new Promise` 构造器返回的 `promise` 对象具有以下内部属性：
+
+- `state` — 最初是 `"pending"`，然后在 `resolve` 被调用时变为 `"fulfilled"`，或者在 `reject` 被调用时变为 `"rejected"`。
+- `result` — 最初是 `undefined`，然后在 `resolve(value)` 被调用时变为 `value`，或者在 `reject(error)` 被调用时变为 `error`。
+
+![](../../学习图片/promise对象状态变化.png)
+
+executor 应该**执行一项工作**（通常是需要花费一些时间的事儿），然后**调用 `resolve` 或 `reject`** 来改变对应的 promise 对象的状态。
+
+```resolve``` 和 ```reject```都是函数名，由js引擎预先定义，只需要调用即可。
+
+```javascript
+let promise = new Promise(function(resolve, reject){
+	setTimeout(() => resolve("done"), 1000);
+});
+```
+
+* 消费者：then、catch、finally三个方法。
+
+1. **then()**
+
+Syntax：
+
+```javascript
+promise.then(
+  function(result) { /* handle a successful result */ },
+  function(error) { /* handle an error */ }
+);
+```
+
+`.then` 的第一个参数是一个函数，该函数**将在 promise resolved 后运行**并接收结果。
+
+`.then` 的第二个参数也是一个函数，该函数将在 promise rejected 后运行并接收 error。
+
+2. **catch()**
+
+如果我们只对error感兴趣，可以使用`.then(null, f)`或者使用.catch()
+
+#### promise链
+
+作为一个好的做法，异步行为应该始终返回一个 promise。这样就可以使得之后我们计划后续的行为成为可能。即使我们现在不打算对链进行扩展，但我们之后可能会需要。
+
+正是由于每个异步都应该返回一个promise对象，所以才可以重复使用.then()语法对promise进行不断链式扩展。
+
+如果 `.then`（或 `catch/finally` 都可以）处理程序（handler）返回一个 promise，那么链的其余部分将会等待，直到它状态变为 settled。当它被 settled 后，其 result（或 error）将被进一步传递下去。
+
+代码示例：
+
+```javascript
+function loadJson(url) {
+  return fetch(url)//可以按照promise来理解，其作用是向远程服务器加载用户信息。
+    .then(response => response.json());
+}
+
+function loadGithubUser(name) {
+  return fetch(`https://api.github.com/users/${name}`)
+    .then(response => response.json());
+}
+
+function showAvatar(githubUser) {
+  return new Promise(function(resolve, reject) {
+    let img = document.createElement('img');
+    img.src = githubUser.avatar_url;
+    img.className = "promise-avatar-example";
+    document.body.append(img);
+
+    setTimeout(() => {
+      img.remove();
+      resolve(githubUser);
+    }, 3000);
+  });
+}
+
+// 使用它们：
+loadJson('/article/promise-chaining/user.json')
+  .then(user => loadGithubUser(user.name))
+  .then(showAvatar)
+  .then(githubUser => alert(`Finished showing ${githubUser.name}`));
+  // ...
+```
+
+#### Promise API
+
+* Promise.all
+
+假设我们需要并行下载几个RUL，并等到所有内容都下载完毕后再对它们进行处理。这就是Promise.all的用途。
+
+```javascript
+let promise = Promise.all([...promises...]);
+```
+
+当所有给定的 promise 都被 settled 时，新的 promise 才会 resolve，并且其结果数组将成为新的 promise 的结果。
+
+例如，下面的 `Promise.all` 在 3 秒之后被 settled，然后它的结果就是一个 `[1, 2, 3]` 数组：
+
+```
+Promise.all([
+	new Promise(resolve => setTimeout(() => resolve(1), 3000)),
+	new Promise(resolve => setTimeout(() => resolve(2), 2000)),
+	new Promise(resolve => setTimeout(() => resolve(3), 1000))
+]).then(console.log);
+```
+
+### Async/await
+
+以更舒适的方式使用promise的一种特殊语法。
+
+* 用Async来修饰function，将其变成一个异步函数。同时表示该函数**总是返回一个promise**。
+* 关键字await只能在async函数内使用，可以让JavaScript引擎等待直到promise完成（settle)并返回结果。
+
+```javascript
+async function f() {
+
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => resolve("done!"), 1000)
+  });
+
+  let result = await promise; // 等待，直到 promise resolve (*)
+
+  console.log(result); // "done!"
+}
+
+f();//返回一个"done!"。
+```
+
+* async/await可以和Promise.all一起使用
+
+```javascript
+let results = await Promise.all([
+  fetch(url1),
+  fetch(url2),
+  ...
+]);
+```
+
+* 异常处理（仅提供示例）
+
+```javascript
+async function loadJson(url) { // (1)
+  let response = await fetch(url); // (2)
+
+  if (response.status == 200) {
+    let json = await response.json(); // (3)
+    return json;
+  }
+
+  throw new Error(response.status);
+}
+
+loadJson('no-such-user.json')
+  .catch(alert); // Error: 404 (4)
+```
+
 ### js事件
 
 每一个可用的事件都会有一个可用的事件处理器，，也就是事件触发时会运行的代码块。当我们定义了一个用来回应事件被激发的代码块的时候，我们说我们**注册了一个事件处理器**。注意事件处理器有时候被叫做**事件监听器**
@@ -461,3 +685,10 @@ p.then(function(data){
 ![](D:\lingwu\DianGroupProjectTask\学习图片\DOM.png)
 
 可以通过`document.getElementByld("btn")`进行对象的获取，然后再进行后续的操作。
+
+
+
+### TypeScript新特性
+
+#### type和interface的区别
+

@@ -1,7 +1,7 @@
 const net = require('net');
-
+//创建一个套接字Socket
 const socket = new net.Socket({});
-
+//与对应ip地址以及端口号建立连接。
 socket.connect({
     host: '127.0.0.1',
     port: 4000
@@ -31,21 +31,21 @@ const lessonids = [
 
 let id = Math.floor(Math.random() * lessonids.length);
 
-
+//向Socket对象中写入内容
 socket.write(encode(id));
+
 
 function encode(index){
     buffer = Buffer.alloc(4);
-    buffer.writeInt32BE(
+    buffer.writeInt32BE(//向buffer里面写内容的函数
         lessonids[index]
     );
-    return buffer;
+    return buffer;//返回一个buffer
 }
 
 //向服务器发送数据
 socket.on('data', (buffer) => {
     console.log(buffer.toString())
-
     id = Math.floor(Math.random()*lessonids.length);
     socket.write(encode(id));
 })
